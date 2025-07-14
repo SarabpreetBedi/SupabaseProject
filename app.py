@@ -11,8 +11,8 @@ import httpx
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
-SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # Use anon key for client
-#SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"] 
+#SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # Use anon key for client
+SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"] 
 supabase = create_client(SUPABASE_URL, st.secrets["SUPABASE_SERVICE_ROLE_KEY"])
 
 # �� Session state
