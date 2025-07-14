@@ -202,7 +202,7 @@ def upload_video():
                     desc=desc,
                     tags=tags,
                     cat=cat,
-                    service_role_key=st.secrets["SUPABASE_KEY"],  # This should be the anon key
+                    service_role_key=st.secrets["SUPABASE_SERVICE_ROLE_KEY"],  # Use the service role key
                     project_url=st.secrets["SUPABASE_URL"]
                 )
                 st.write("Insert result:", response.json())
