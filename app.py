@@ -13,9 +13,9 @@ import httpx
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # Use anon key for client
 #SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"] 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+supabase = create_client(SUPABASE_URL, st.secrets["SUPABASE_SERVICE_ROLE_KEY"])
 
-# 🔁 Session state
+# �� Session state
 if 'user' not in st.session_state:
     st.session_state.user = None
 if 'profile' not in st.session_state:
@@ -319,6 +319,7 @@ else:
         login()
     with tab2:
         signup()
+
 
 
 
