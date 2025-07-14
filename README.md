@@ -58,4 +58,15 @@ This project is deployed at: [https://supabaseproject-e4yb8nkwavnixuv2jztgqf.str
 **In Short:**
 - **Authentication:** Supabase Auth with JWT.
 - **Authorization:** RLS policies using `auth.uid()` or `current_setting('request.jwt.claim.sub', true)`.
-- **IT Security:** Service role key only in backend, secrets not in code, unique file names, no sensitive info exposed. 
+- **IT Security:** Service role key only in backend, secrets not in code, unique file names, no sensitive info exposed.
+
+  ---
+
+## Supabase Setup Screenshots
+
+| Step  | Screenshot |
+|-------|------------|
+| 1     | ![Supabase Step 1](.streamlit/Supabase.png) |
+| 2     | ![Supabase Step 2](.streamlit/Supabase2.png) |
+| 3     | ![Supabase Step 3](.streamlit/Supabase3.png) |
+| 4     | ![Supabase Step 4](.streamlit/Supabase4.png) | 
