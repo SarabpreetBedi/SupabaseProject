@@ -1,3 +1,5 @@
+# pip install streamlit supabase pandas
+
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
@@ -127,7 +129,7 @@ def logout():
 
 def insert_video_with_jwt(user, file, url, title, desc, tags, cat, project_url):
     # Get the service role key, or show a clear error if missing
-    service_role_key = st.secrets.get("SUPABASE_SERVICE_ROLE_KEY")
+    service_role_key = st.secrets["SUPABASE_SERVICE_ROLE_KEY"]
     st.write("Service role key (first 20 chars):", service_role_key[:20] if service_role_key else "NOT FOUND")
     if not service_role_key:
         st.error("SUPABASE_SERVICE_ROLE_KEY is missing from your secrets! Please add it to .streamlit/secrets.toml or Streamlit Cloud secrets.")
