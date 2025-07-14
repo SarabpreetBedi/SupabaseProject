@@ -11,11 +11,14 @@ import httpx
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
-#SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # Use anon key for client
-SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"] 
-supabase = create_client(SUPABASE_URL, st.secrets["SUPABASE_SERVICE_ROLE_KEY"])
+service_role_key = st.secrets.get("SUPABASE_SERVICE_ROLE_KEY")
+if not service_role_key:
+    st.error("SUPABASE_SERVICE_ROLE_KEY is missing from your secrets! Please add it to .streamlit/secrets.toml or Streamlit Cloud secrets.")
+    raise RuntimeError("SUPABASE_SERVICE_ROLE_KEY is missing from your secrets!")
+SUPABASE_KEY = service_role_key
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# �� Session state
+#  Session state
 if 'user' not in st.session_state:
     st.session_state.user = None
 if 'profile' not in st.session_state:
@@ -129,18 +132,15 @@ def logout():
 
 def insert_video_with_jwt(user, file, url, title, desc, tags, cat, project_url):
     # Get the service role key, or show a clear error if missing
-    service_role_key = st.secrets["SUPABASE_SERVICE_ROLE_KEY"]
-    st.write("Service role key (first 20 chars):", service_role_key[:20] if service_role_key else "NOT FOUND")
+    service_role_key = st.secrets.get("SUPABASE_SERVICE_ROLE_KEY")
     if not service_role_key:
         st.error("SUPABASE_SERVICE_ROLE_KEY is missing from your secrets! Please add it to .streamlit/secrets.toml or Streamlit Cloud secrets.")
         return None
-    endpoint = f"{project_url}/rest/v1/videos"
     headers = {
-        "apikey": service_role_key,  # Service role key
-        "Authorization": f"Bearer {service_role_key}",  # Service role key
+        "apikey": service_role_key,
+        "Authorization": f"Bearer {service_role_key}",
         "Content-Type": "application/json"
     }
-    st.write("Headers being sent:", headers)
     data = {
         "user_id": user.id,
         "file_name": file.name,
@@ -151,7 +151,7 @@ def insert_video_with_jwt(user, file, url, title, desc, tags, cat, project_url):
         "category": cat
     }
     with httpx.Client() as client:
-        response = client.post(endpoint, headers=headers, json=data)
+        response = client.post(f"{project_url}/rest/v1/videos", headers=headers, json=data)
     return response
 
 # 📤 Upload videos
