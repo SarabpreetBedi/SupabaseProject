@@ -7,7 +7,7 @@ import requests
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
-SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # Use service role key
+SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"]  # Use service role key
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -37,6 +37,7 @@ def login():
             res = supabase.auth.sign_in_with_password({"email": email, "password": pwd})
             if res.user:
                 st.session_state.user = res.user
+                st.session_state.session = res.session  # Store session for JWT access
                 # Do NOT re-create the supabase client here!
                 # Try to get existing profile, create one if it doesn't exist
                 try:
@@ -123,7 +124,7 @@ def logout():
     st.success("Logged out")
 
 def insert_video_with_jwt(user, file, url, title, desc, tags, cat, anon_key, project_url):
-    jwt = user.access_token  # This is the user's JWT from supabase.auth.sign_in_with_password
+    jwt = st.session_state.session.access_token  # Get JWT from session
     endpoint = f"{project_url}/rest/v1/videos"
     headers = {
         "apikey": anon_key,
@@ -289,4 +290,5 @@ else:
         login()
     with tab2:
         signup()
+
 
