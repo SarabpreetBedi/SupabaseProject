@@ -1,5 +1,3 @@
-# pip install streamlit supabase pandas
-
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
@@ -8,6 +6,7 @@ import time
 import requests
 import json
 import httpx
+import uuid
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -164,17 +163,16 @@ def upload_video():
         return
     # Debug: print JWT and session (remove after testing)
     jwt = st.session_state.session.access_token
-    st.write("JWT (copy this for jwt.io):")
-    st.code(jwt)
     # Also print the user_id and sub for comparison
     try:
         import jwt as pyjwt
         payload = pyjwt.decode(jwt, options={"verify_signature": False})
-        st.write("JWT sub:", payload.get("sub"))
-        st.write("Session user_id:", st.session_state.user.id)
+        # st.write("JWT sub:", payload.get("sub"))
+        # st.write("Session user_id:", st.session_state.user.id)
     except Exception as e:
-        st.write("JWT decode error:", e)
-    st.write("Session:", st.session_state.session)
+        # st.write("JWT decode error:", e)
+        pass
+    # st.write("Session:", st.session_state.session)
     file = st.file_uploader("Select video", type=["mp4", "mov", "avi"])
     title = st.text_input("Title")
     desc = st.text_area("Description")
@@ -182,7 +180,7 @@ def upload_video():
     cat = st.selectbox("Category", ["Education", "Entertainment", "Tutorial", "Other"])
     if file and st.button("Upload"):
         user_id = st.session_state.user.id
-        fname = f"{user_id}/{file.name}"
+        fname = f"{user_id}/{uuid.uuid4()}_{file.name}"
         file_size_mb = len(file.read()) / (1024*1024)
         file.seek(0)
         if file_size_mb > 100:
@@ -213,7 +211,7 @@ def upload_video():
                     project_url=st.secrets["SUPABASE_URL"]
                 )
                 if response: # Check if response is not None (meaning no error)
-                    st.write("Insert result:", response.json())
+                    # st.write("Insert result:", response.json())
                     if response.status_code == 201:
                         st.success("🎉 Video uploaded and record inserted!")
                     else:
@@ -319,7 +317,6 @@ else:
         login()
     with tab2:
         signup()
-
 
 
 
