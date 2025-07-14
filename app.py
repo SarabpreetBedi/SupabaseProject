@@ -1,11 +1,10 @@
-# pip install streamlit supabase pandas
-
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
 import pandas as pd
 import time
 import requests
+import json
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -308,6 +307,7 @@ else:
         login()
     with tab2:
         signup()
+
 
 
 
