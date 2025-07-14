@@ -37,7 +37,6 @@ This project is deployed at: [https://supabaseproject-e4yb8nkwavnixuv2jztgqf.str
 
 - **Service Role Key** is used only in trusted backend code (your Streamlit app, not exposed to users).
   - This key bypasses RLS and should never be exposed in frontend/public code.
-- **Anon Key** is used for public/unauthenticated access (not for privileged operations).
 - **Secrets** (keys) are stored securely in `.streamlit/secrets.toml` or Streamlit Cloud secrets, not in code.
 - **No sensitive information is printed or exposed to users.**
 - **Unique file names** are generated for uploads to prevent collisions and information leakage.
