@@ -9,8 +9,8 @@ import httpx
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
-#SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"]  # Use service role key
-SUPABASE_KEY = st.secrets["SUPABASE_KEY"] 
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # Use anon key for client
+#SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"] 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # 🔁 Session state
@@ -125,8 +125,12 @@ def logout():
     st.session_state.profile = {}
     st.success("Logged out")
 
-def insert_video_with_jwt(user, file, url, title, desc, tags, cat, service_role_key, project_url):
-    # WARNING: Using the service role key bypasses RLS. Only use in trusted backend code!
+def insert_video_with_jwt(user, file, url, title, desc, tags, cat, project_url):
+    # Get the service role key, or show a clear error if missing
+    service_role_key = st.secrets.get("SUPABASE_SERVICE_ROLE_KEY")
+    if not service_role_key:
+        st.error("SUPABASE_SERVICE_ROLE_KEY is missing from your secrets! Please add it to .streamlit/secrets.toml or Streamlit Cloud secrets.")
+        return None
     endpoint = f"{project_url}/rest/v1/videos"
     headers = {
         "apikey": service_role_key,  # Service role key
@@ -202,14 +206,16 @@ def upload_video():
                     desc=desc,
                     tags=tags,
                     cat=cat,
-                    service_role_key=st.secrets["SUPABASE_SERVICE_ROLE_KEY"],  # Use the service role key
                     project_url=st.secrets["SUPABASE_URL"]
                 )
-                st.write("Insert result:", response.json())
-                if response.status_code == 201:
-                    st.success("🎉 Video uploaded and record inserted!")
+                if response: # Check if response is not None (meaning no error)
+                    st.write("Insert result:", response.json())
+                    if response.status_code == 201:
+                        st.success("🎉 Video uploaded and record inserted!")
+                    else:
+                        st.error(f"Insert failed: {response.json()}")
                 else:
-                    st.error(f"Insert failed: {response.json()}")
+                    st.error("❌ Failed to insert video record due to missing service role key.")
         except Exception as e:
             st.error(f"❌ Upload failed: {e}")
             if "timeout" in str(e).lower():
@@ -309,6 +315,7 @@ else:
         login()
     with tab2:
         signup()
+
 
 
 
