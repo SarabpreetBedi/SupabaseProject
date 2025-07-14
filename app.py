@@ -1,3 +1,5 @@
+# pip install streamlit supabase pandas
+
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
@@ -155,6 +157,14 @@ def upload_video():
     jwt = st.session_state.session.access_token
     st.write("JWT (copy this for jwt.io):")
     st.code(jwt)
+    # Also print the user_id and sub for comparison
+    try:
+        import jwt as pyjwt
+        payload = pyjwt.decode(jwt, options={"verify_signature": False})
+        st.write("JWT sub:", payload.get("sub"))
+        st.write("Session user_id:", st.session_state.user.id)
+    except Exception as e:
+        st.write("JWT decode error:", e)
     st.write("Session:", st.session_state.session)
     file = st.file_uploader("Select video", type=["mp4", "mov", "avi"])
     title = st.text_input("Title")
@@ -298,6 +308,7 @@ else:
         login()
     with tab2:
         signup()
+
 
 
 
