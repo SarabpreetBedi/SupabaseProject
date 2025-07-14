@@ -125,11 +125,11 @@ def logout():
     st.success("Logged out")
 
 def insert_video_with_jwt(user, file, url, title, desc, tags, cat, anon_key, project_url):
-    jwt = st.session_state.session.access_token  # Get JWT from session
+    jwt = st.session_state.session.access_token  # This is the user's JWT
     endpoint = f"{project_url}/rest/v1/videos"
     headers = {
-        "apikey": anon_key,
-        "Authorization": f"Bearer {jwt}",
+        "apikey": anon_key,  # This is the anon key from .toml
+        "Authorization": f"Bearer {jwt}",  # This is the user's JWT from session
         "Content-Type": "application/json"
     }
     data = {
@@ -307,6 +307,7 @@ else:
         login()
     with tab2:
         signup()
+
 
 
 
