@@ -1,3 +1,5 @@
+# pip install streamlit supabase pandas
+
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
@@ -5,6 +7,7 @@ import pandas as pd
 import time
 import requests
 import json
+import httpx
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -141,7 +144,8 @@ def insert_video_with_jwt(user, file, url, title, desc, tags, cat, anon_key, pro
         "tags": tags,
         "category": cat
     }
-    response = requests.post(endpoint, headers=headers, json=data)
+    with httpx.Client() as client:
+        response = client.post(endpoint, headers=headers, json=data)
     return response
 
 # 📤 Upload videos
@@ -307,9 +311,6 @@ else:
         login()
     with tab2:
         signup()
-
-
-
 
 
 
