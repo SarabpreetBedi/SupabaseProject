@@ -152,7 +152,9 @@ def upload_video():
         st.error("Session or user not found. Please log out and log in again.")
         return
     # Debug: print JWT and session (remove after testing)
-    st.write("JWT:", st.session_state.session.access_token)
+    jwt = st.session_state.session.access_token
+    st.write("JWT (copy this for jwt.io):")
+    st.code(jwt)
     st.write("Session:", st.session_state.session)
     file = st.file_uploader("Select video", type=["mp4", "mov", "avi"])
     title = st.text_input("Title")
@@ -296,6 +298,7 @@ else:
         login()
     with tab2:
         signup()
+
 
 
 
