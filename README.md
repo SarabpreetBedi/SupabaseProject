@@ -66,7 +66,7 @@ This project is deployed at: [https://supabaseproject-e4yb8nkwavnixuv2jztgqf.str
 
 | Step  | Screenshot |
 |-------|------------|
-| 1     | ![Supabase Step 1](.streamlit/Supabase.png) |
-| 2     | ![Supabase Step 2](.streamlit/Supabase2.png) |
-| 3     | ![Supabase Step 3](.streamlit/Supabase3.png) |
-| 4     | ![Supabase Step 4](.streamlit/Supabase4.png) | 
+| 1     | ![Supabase Step 1](.devcontainer/Supabase.png) |
+| 2     | ![Supabase Step 2](.devcontainer/Supabase2.png) |
+| 3     | ![Supabase Step 3](.devcontainer/Supabase3.png) |
+| 4     | ![Supabase Step 4](.devcontainer/Supabase4.png) | 
