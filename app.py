@@ -1,5 +1,3 @@
-# pip install streamlit supabase pandas
-
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
@@ -127,12 +125,12 @@ def logout():
     st.session_state.profile = {}
     st.success("Logged out")
 
-def insert_video_with_jwt(user, file, url, title, desc, tags, cat, anon_key, project_url):
-    jwt = st.session_state.session.access_token  # This is the user's JWT
+def insert_video_with_jwt(user, file, url, title, desc, tags, cat, service_role_key, project_url):
+    # WARNING: Using the service role key bypasses RLS. Only use in trusted backend code!
     endpoint = f"{project_url}/rest/v1/videos"
     headers = {
-        "apikey": anon_key,  # This is the anon key from .toml
-        "Authorization": f"Bearer {jwt}",  # This is the user's JWT from session
+        "apikey": service_role_key,  # Service role key
+        "Authorization": f"Bearer {service_role_key}",  # Service role key
         "Content-Type": "application/json"
     }
     data = {
@@ -204,7 +202,7 @@ def upload_video():
                     desc=desc,
                     tags=tags,
                     cat=cat,
-                    anon_key=st.secrets["SUPABASE_KEY"],  # This should be the anon key
+                    service_role_key=st.secrets["SUPABASE_KEY"],  # This should be the anon key
                     project_url=st.secrets["SUPABASE_URL"]
                 )
                 st.write("Insert result:", response.json())
@@ -311,6 +309,7 @@ else:
         login()
     with tab2:
         signup()
+
 
 
 
