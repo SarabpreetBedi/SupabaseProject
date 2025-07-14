@@ -128,6 +128,7 @@ def logout():
 def insert_video_with_jwt(user, file, url, title, desc, tags, cat, project_url):
     # Get the service role key, or show a clear error if missing
     service_role_key = st.secrets.get("SUPABASE_SERVICE_ROLE_KEY")
+    st.write("Service role key (first 20 chars):", service_role_key[:20] if service_role_key else "NOT FOUND")
     if not service_role_key:
         st.error("SUPABASE_SERVICE_ROLE_KEY is missing from your secrets! Please add it to .streamlit/secrets.toml or Streamlit Cloud secrets.")
         return None
@@ -137,6 +138,7 @@ def insert_video_with_jwt(user, file, url, title, desc, tags, cat, project_url):
         "Authorization": f"Bearer {service_role_key}",  # Service role key
         "Content-Type": "application/json"
     }
+    st.write("Headers being sent:", headers)
     data = {
         "user_id": user.id,
         "file_name": file.name,
@@ -315,6 +317,7 @@ else:
         login()
     with tab2:
         signup()
+
 
 
 
