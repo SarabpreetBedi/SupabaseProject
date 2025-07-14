@@ -1,3 +1,5 @@
+# pip install streamlit supabase pandas
+
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
@@ -7,7 +9,7 @@ import requests
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
-SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # Use service role key
+SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"]  # Use service role key
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -147,6 +149,12 @@ def insert_video_with_jwt(user, file, url, title, desc, tags, cat, anon_key, pro
 def upload_video():
     st.subheader("Upload a New Video")
     st.info("📁 Supported formats: MP4, MOV, AVI | Max size: 100MB")
+    # Ensure session exists before proceeding
+    if not st.session_state.get("session"):
+        st.error("Session not found. Please log out and log in again.")
+        return
+    # Debug: print JWT (remove after testing)
+    st.write("JWT:", st.session_state.session.access_token)
     file = st.file_uploader("Select video", type=["mp4", "mov", "avi"])
     title = st.text_input("Title")
     desc = st.text_area("Description")
@@ -290,5 +298,6 @@ else:
         login()
     with tab2:
         signup()
+
 
 
