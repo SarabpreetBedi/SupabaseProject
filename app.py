@@ -1,14 +1,13 @@
-# pip install streamlit supabase pandas
-
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
 import pandas as pd
 import time
+import requests
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
-SUPABASE_KEY = st.secrets["SUPABASE_KEY"]  # Use service role key
+SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"]  # Use service role key
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -123,6 +122,26 @@ def logout():
     st.session_state.profile = {}
     st.success("Logged out")
 
+def insert_video_with_jwt(user, file, url, title, desc, tags, cat, anon_key, project_url):
+    jwt = user.access_token  # This is the user's JWT from supabase.auth.sign_in_with_password
+    endpoint = f"{project_url}/rest/v1/videos"
+    headers = {
+        "apikey": anon_key,
+        "Authorization": f"Bearer {jwt}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "user_id": user.id,
+        "file_name": file.name,
+        "url": url,
+        "title": title,
+        "description": desc,
+        "tags": tags,
+        "category": cat
+    }
+    response = requests.post(endpoint, headers=headers, json=data)
+    return response
+
 # 📤 Upload videos
 def upload_video():
     st.subheader("Upload a New Video")
@@ -133,6 +152,7 @@ def upload_video():
     tags_in = st.text_input("Tags (comma-separated)")
     cat = st.selectbox("Category", ["Education", "Entertainment", "Tutorial", "Other"])
     if file and st.button("Upload"):
+        st.write("Current user:", st.session_state.user)
         user_id = st.session_state.user.id
         fname = f"{user_id}/{file.name}"
         file_size_mb = len(file.read()) / (1024*1024)
@@ -145,6 +165,7 @@ def upload_video():
             with st.spinner("🔄 Uploading video... This may take a few minutes for large files."):
                 file_bytes = file.read()
                 file.seek(0)
+                # Upload to Supabase storage
                 result = supabase.storage.from_("videos").upload(
                     fname,
                     file_bytes,
@@ -152,21 +173,23 @@ def upload_video():
                 )
                 url = supabase.storage.from_("videos").get_public_url(fname)
                 tags = [t.strip() for t in tags_in.split(",") if t.strip()]
-                video_data = {
-                    "user_id": user_id,
-                    "file_name": file.name,
-                    "url": url,
-                    "title": title,
-                    "description": desc,
-                    "tags": tags,
-                    "category": cat
-                }
-               
-                result = supabase.table("videos").insert(video_data).execute()
-               
-                st.success("🎉 Video uploaded successfully!")
-                st.info(f"📁 File: {file.name}")
-                st.info(f"📊 Size: {file_size_mb:.2f} MB")
+                # Insert into videos table using REST API and JWT
+                response = insert_video_with_jwt(
+                    user=st.session_state.user,
+                    file=file,
+                    url=url,
+                    title=title,
+                    desc=desc,
+                    tags=tags,
+                    cat=cat,
+                    anon_key=st.secrets["SUPABASE_KEY"],
+                    project_url=st.secrets["SUPABASE_URL"]
+                )
+                st.write("Insert result:", response.json())
+                if response.status_code == 201:
+                    st.success("🎉 Video uploaded and record inserted!")
+                else:
+                    st.error(f"Insert failed: {response.json()}")
         except Exception as e:
             st.error(f"❌ Upload failed: {e}")
             if "timeout" in str(e).lower():
@@ -266,3 +289,4 @@ else:
         login()
     with tab2:
         signup()
+
