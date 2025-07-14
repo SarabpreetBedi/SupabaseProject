@@ -1,5 +1,3 @@
-# pip install streamlit supabase pandas
-
 import streamlit as st
 from supabase import create_client, Client
 from datetime import datetime
@@ -9,8 +7,8 @@ import requests
 
 # 🔐 Supabase credentials from secrets.toml
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
-SUPABASE_KEY = SUPABASE_KEY = st.secrets["SUPABASE_KEY"]   # Use service role key
-
+#SUPABASE_KEY = st.secrets["SUPABASE_SERVICE_ROLE_KEY"]  # Use service role key
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"] 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # 🔁 Session state
@@ -149,19 +147,19 @@ def insert_video_with_jwt(user, file, url, title, desc, tags, cat, anon_key, pro
 def upload_video():
     st.subheader("Upload a New Video")
     st.info("📁 Supported formats: MP4, MOV, AVI | Max size: 100MB")
-    # Ensure session exists before proceeding
-    if not st.session_state.get("session"):
-        st.error("Session not found. Please log out and log in again.")
+    # Ensure both user and session exist before proceeding
+    if not st.session_state.get("user") or not st.session_state.get("session"):
+        st.error("Session or user not found. Please log out and log in again.")
         return
-    # Debug: print JWT (remove after testing)
+    # Debug: print JWT and session (remove after testing)
     st.write("JWT:", st.session_state.session.access_token)
+    st.write("Session:", st.session_state.session)
     file = st.file_uploader("Select video", type=["mp4", "mov", "avi"])
     title = st.text_input("Title")
     desc = st.text_area("Description")
     tags_in = st.text_input("Tags (comma-separated)")
     cat = st.selectbox("Category", ["Education", "Entertainment", "Tutorial", "Other"])
     if file and st.button("Upload"):
-        st.write("Current user:", st.session_state.user)
         user_id = st.session_state.user.id
         fname = f"{user_id}/{file.name}"
         file_size_mb = len(file.read()) / (1024*1024)
@@ -191,7 +189,7 @@ def upload_video():
                     desc=desc,
                     tags=tags,
                     cat=cat,
-                    anon_key=st.secrets["SUPABASE_KEY"],
+                    anon_key=st.secrets["SUPABASE_KEY"],  # This should be the anon key
                     project_url=st.secrets["SUPABASE_URL"]
                 )
                 st.write("Insert result:", response.json())
